@@ -1,6 +1,7 @@
+from os import system
 from typing import Optional
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, create_engine, or_, select
 
 
 class Hero(SQLModel, table=True):
@@ -24,11 +25,20 @@ def create_heroes():
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     hero_2 = Hero(name="Spider-Boy", secret_name="Pedro Parqueador")
     hero_3 = Hero(name="Rusty-Man", secret_name="Tommy Sharp", age=48)
+    hero_4 = Hero(name="Tarantula", secret_name="Natalia Roman-on", age=32)
+    hero_5 = Hero(name="Black Lion", secret_name="Trevor Challa", age=35)
+    hero_6 = Hero(name="Dr. Weird", secret_name="Steve Weird", age=36)
+    hero_7 = Hero(name="Captain North America",
+                  secret_name="Esteban Rogelios", age=93)
 
     with Session(engine) as session:
         session.add(hero_1)
         session.add(hero_2)
         session.add(hero_3)
+        session.add(hero_4)
+        session.add(hero_5)
+        session.add(hero_6)
+        session.add(hero_7)
 
         session.commit()
 
@@ -40,10 +50,20 @@ def select_heroes():
         print(results)
 
 
+def select_hero():
+    with Session(engine) as session:
+        result = session.exec(select(Hero).where(Hero.name != "Deadpond").where(
+            or_(Hero.age <= 35, Hero.age > 90)))
+        for hero in result:
+            print(hero)
+
+
 def main():
     create_db_and_tables()
     create_heroes()
     select_heroes()
+    select_hero()
+    system("rm database.db")
 
 
 if __name__ == "__main__":
