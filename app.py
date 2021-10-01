@@ -45,9 +45,10 @@ def create_heroes():
 
 def select_heroes():
     with Session(engine) as session:
-        results = session.exec(select(Hero)).all()
-
+        results = session.exec(select(Hero).offset(3).limit(3)).all()
+        print(10*'-')
         print(results)
+        print(10*'-')
 
 
 def select_hero():
@@ -58,12 +59,39 @@ def select_hero():
             print(hero)
 
 
+def update_heroes():
+    with Session(engine) as session:
+        statement = select(Hero).where(Hero.name == "Spider-Boy")
+        results = session.exec(statement)
+        hero = results.one()  # one: if results != 1: raise error!
+        print("Hero:", hero)
+
+        hero.age = 10
+        session.add(hero)
+        session.commit()
+        session.refresh(hero)
+        print("Hero:", hero)
+
+
+def delete_heroes():
+    with Session(engine) as session:
+        statement = select(Hero).where(Hero.name == "Spider-Boy")
+        results = session.exec(statement)
+        hero = results.one()
+        print("Hero: ", hero)
+
+        session.delete(hero)
+        session.commit()
+
+
 def main():
+    system("rm database.db")
     create_db_and_tables()
     create_heroes()
-    select_heroes()
-    select_hero()
-    system("rm database.db")
+    # select_heroes()
+    # select_hero()
+    # update_heroes()
+    delete_heroes()
 
 
 if __name__ == "__main__":
