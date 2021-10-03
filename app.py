@@ -1,6 +1,5 @@
 from os import system
 from typing import Optional
-from sqlalchemy.sql.expression import table
 
 from sqlmodel import Field, Session, SQLModel, create_engine, or_, select
 
@@ -23,7 +22,7 @@ class Team(SQLModel, table=True):
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
-engine = create_engine(sqlite_url, echo=True)
+engine = create_engine(sqlite_url, echo=False)
 
 
 def create_db_and_tables():
@@ -62,6 +61,26 @@ def create_heroes():
         print("Created hero:", hero_deadpond)
         print("Created hero:", hero_rusty_man)
         print("Created hero:", hero_spider_boy)
+        print('______________')
+
+
+def select_heroes():
+    with Session(engine) as session:
+        results = session.exec(
+            select(Hero, Team).join(Team, isouter=True).where(Team.name == "Preventers"))
+        for hero, team in results:
+            print("Hero:", hero, "Team:", team)
+
+
+# def select_heroes():
+#     with Session(engine) as session:
+#         results = session.exec(
+#             select(Hero, Team).where(Hero.team_id == Team.id))
+
+
+#         for hero, team in results:
+#             print("Hero:", hero, "Team:", team)
+
 
 # def create_heroes():
 #     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
@@ -130,6 +149,7 @@ def main():
     system("rm database.db")
     create_db_and_tables()
     create_heroes()
+    select_heroes()
     # select_heroes()
     # select_hero()
     # update_heroes()
