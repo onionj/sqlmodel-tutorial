@@ -99,6 +99,36 @@ def create_heroes():
         print("Preventers new hero:", hero_cap)
 
 
+def select_heroes():
+    with Session(engine) as session:
+        statement = select(Team).where(Team.name == "Preventers")
+        result = session.exec(statement)
+        team_preventers = result.one()
+
+        print("Preventers heroes:", team_preventers.heroes)
+
+
+def update_heroes():
+    with Session(engine) as session:
+        statement = select(Hero).where(Hero.name == "Spider-Boy")
+        result = session.exec(statement)
+        hero_spider_boy = result.one()
+
+        hero_spider_boy.team = None
+        session.add(hero_spider_boy)
+        session.commit()
+
+        session.refresh(hero_spider_boy)
+        print("Spider-Boy without team:", hero_spider_boy)
+
+# def select_heroes():
+#     with Session(engine) as session:
+#         hero_spider_boy = session.exec(
+#             select(Hero).where(Hero.name == "Spider-Boy")).one()
+
+#         print("hero_spider_boy: ", hero_spider_boy.name,
+#               "team: ", hero_spider_boy.team)
+
 # def create_heroes():
 #     with Session(engine) as session:
 #         team_preventers = Team(name="Preventers", headquarters="Sharp Tower")
@@ -232,10 +262,9 @@ def main():
     system("rm database.db")
     create_db_and_tables()
     create_heroes()
-    # select_heroes()
-    # select_heroes()
+    select_heroes()
     # select_hero()
-    # update_heroes()
+    update_heroes()
     # delete_heroes()
 
 
